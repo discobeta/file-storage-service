@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: file-storage
+  labels:
+    run: file-storage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: file-storage
+  template:
+    metadata:
+      labels:
+        run: file-storage
+    spec:
+      containers:
+        - image: "file-storage-service:latest"
+          name: website-runner
+          imagePullPolicy: Always
+          securityContext:
+            privileged: false
+          resources:
+            requests:
+              cpu: 100m
+              memory:  250Mi
+            limits:
+              cpu: 200m
+              memory: 250Mi
+          env:
+            - name: ENVIRONMENT
+              value: "dev"
+            - name: deployment_trigger
+              value: DEPLOY_TRIGGER
+          ports:
+            - containerPort: 8000
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /health-check
+              port: http
+            initialDelaySeconds: 15
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /health-check
+              port: http
+            initialDelaySeconds: 15
+            timeoutSeconds: 1
+      # Depends on NFS service
+          volumeMounts:
+          - mountPath: /app/app/static/
+            name: data
+            user:
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: nfs-file-storage

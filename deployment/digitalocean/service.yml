@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: file-storage-service
+spec:
+  type: ClusterIP
+  selector:
+    run: file-storage
+  ports:
+    - protocol: TCP
+      name: http
+      port: 80
+      targetPort: 8000
+    - protocol: TCP
+      name: https
+      port: 443
+      targetPort: 8000
