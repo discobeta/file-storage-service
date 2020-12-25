@@ -1,0 +1,5 @@
+__pycache__/
+pid.file
+.envrc
+app/static
+.DS_Store
